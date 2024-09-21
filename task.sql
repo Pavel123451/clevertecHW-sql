@@ -58,33 +58,26 @@ order by scheduled_departure asc
 limit 1;
 
 -- Вариант 2
-select * 
-from flights
-where departure_airport in (
-    select airport_code
-    from airports
-    where city = 'Екатеринбург'
-) 
-and arrival_airport in (
-    select airport_code
-    from airports
-    where city = 'Москва'
-) 
-and (status = 'On time' or status = 'Delayed')
-and scheduled_departure = (
-    select min(scheduled_departure)
+with me_flights as (
+    select *
     from flights
     where departure_airport in (
         select airport_code
         from airports
         where city = 'Екатеринбург'
-    ) 
-    and arrival_airport in (
+    )
+      and arrival_airport in (
         select airport_code
         from airports
         where city = 'Москва'
-    ) 
-    and (status = 'On time' or status = 'Delayed')
+    )
+      and (status = 'On time' or status = 'Delayed')
+)
+select *
+from me_flights
+where scheduled_departure = (
+    select min(scheduled_departure)
+    from me_flights
 );
 
 
